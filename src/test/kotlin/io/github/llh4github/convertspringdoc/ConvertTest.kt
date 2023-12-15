@@ -38,4 +38,10 @@ public class IndexController {
         }
         rs.result.ifPresent { YamlPrinter.print(it) }
     }
+
+    @Test
+    fun b() {
+        val rs = JavaParser().parse("@Api()")
+        rs.result.get()
+    }
 }
