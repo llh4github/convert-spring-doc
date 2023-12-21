@@ -40,7 +40,7 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
     private fun singleAnno(anno: SingleMemberAnnotationExpr) {
         val value = anno.memberValue
         typeDeclaration.tryAddImportToParentCompilationUnit(Tag::class.java)
-        val needAdd = SingleMemberAnnotationExpr(Name(sourceAnno), value)
+        val needAdd = SingleMemberAnnotationExpr(Name("Tag"), value)
         typeDeclaration.addAnnotation(needAdd)
         anno.remove()
         logger.debug("$className 注解 $anno 替换为 $needAdd")

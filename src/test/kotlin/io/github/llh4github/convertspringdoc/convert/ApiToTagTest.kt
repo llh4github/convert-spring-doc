@@ -22,9 +22,8 @@ class ApiToTagTest {
        """.trimIndent()
 
 
-    @ParameterizedTest
-    @ValueSource()
-    fun t1() {
+    @Test
+    fun t12() {
         val parserRs = StaticJavaParser.parse(clazz)
         parserRs.types.forEach { ApiToTag(it).convert() }
         val rs = DefaultPrettyPrinter().print(parserRs)
