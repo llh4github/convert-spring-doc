@@ -1,11 +1,13 @@
 package io.github.llh4github.convertspringdoc.convert
 
+import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.github.javaparser.ast.expr.*
 import io.github.llh4github.convertspringdoc.dto.sw2.ApiAnno
 import io.github.llh4github.convertspringdoc.dto.sw3.TagAnno
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
 import org.apache.logging.log4j.kotlin.Logging
 
 /**
@@ -45,28 +47,74 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
     }
 
     private fun normalAnnotation(anno: NormalAnnotationExpr) {
-        anno.pairs.forEach {
-           handleHiddenProperty(it)
-        }
+        val list = anno.pairs
+        handleHiddenProperty(list)
+        handleValueAndTagsProperty(list)
         anno.remove()
     }
-    private fun handleValueProperty(pair: MemberValuePair) {
-        if (pair.name.toString() != "value") {
-            logger.debug("$className Api注解无 hidden属性")
-            return
+
+    private fun handleValueProperty(
+        pairs: NodeList<MemberValuePair>
+    ): SingleMemberAnnotationExpr? {
+        val valuePairs = pairs.firstOrNull { it.name.asString() == "value" }
+        if (valuePairs == null) {
+            logger.debug("$className Api注解无 value属性")
+            return null
         }
-        typeDeclaration.tryAddImportToParentCompilationUnit(Hidden::class.java)
-        val needAdd = MarkerAnnotationExpr(Name("Hidden"))
-        typeDeclaration.addAnnotation(needAdd)
+        val value = valuePairs.value
+        typeDeclaration.tryAddImportToParentCompilationUnit(Tag::class.java)
+        return SingleMemberAnnotationExpr(Name("Tag"), value)
     }
-    private fun handleHiddenProperty(pair: MemberValuePair) {
-        if (pair.name.toString() != "hidden") {
-            logger.debug("$className Api注解无 hidden属性")
-            return
+
+    private fun handleValueAndTagsProperty(pairs: NodeList<MemberValuePair>) {
+        val tagAnno = handleValueProperty(pairs)
+        val tagsPairs = pairs.firstOrNull { it.name.asString() == "tags" }
+        if (tagsPairs == null) {
+            logger.debug("$className Api注解无 tags 属性")
+            tagAnno?.let { typeDeclaration.addAnnotation(it) }
+        } else {
+            typeDeclaration.tryAddImportToParentCompilationUnit(Tags::class.java)
+            val nodeList: NodeList<Expression> = NodeList()
+            when (tagsPairs.value) {
+                is StringLiteralExpr -> {
+                    val anno = SingleMemberAnnotationExpr(Name("Tag"), tagsPairs.value)
+                    nodeList.add(anno)
+                }
+
+                is ArrayInitializerExpr -> {
+                    val a = tagsPairs.value as ArrayInitializerExpr
+                    val list = a.values.map { SingleMemberAnnotationExpr(Name("Tag"), it) }
+                        .toList()
+                    nodeList.addAll(list)
+                }
+
+                else -> logger.error(
+                    "$className @Api中的tags属性类型未知 ${
+                        tagsPairs.value.asStringLiteralExpr().asString()
+                    }"
+                )
+            }
+            val pairs2 = NodeList<MemberValuePair>()
+
+            tagAnno?.let { nodeList.add(it) }
+            val arr = ArrayInitializerExpr(nodeList)
+            pairs2.add(MemberValuePair("value", arr))
+            val tagsAnno = NormalAnnotationExpr(Name("Tags"), pairs2)
+            typeDeclaration.addAnnotation(tagsAnno)
         }
-        typeDeclaration.tryAddImportToParentCompilationUnit(Hidden::class.java)
-        val needAdd = MarkerAnnotationExpr(Name("Hidden"))
-        typeDeclaration.addAnnotation(needAdd)
+    }
+
+    private fun handleHiddenProperty(pairs: NodeList<MemberValuePair>) {
+        pairs.find { it.name.toString() == "hidden" }?.let {
+            val value = it.value.asBooleanLiteralExpr()
+            if (value.value) {
+                typeDeclaration.tryAddImportToParentCompilationUnit(Hidden::class.java)
+                val needAdd = MarkerAnnotationExpr(Name("Hidden"))
+                typeDeclaration.addAnnotation(needAdd)
+            } else {
+                logger.debug("$className Api注解 hidden属性值为 $value")
+            }
+        }
     }
 
 
