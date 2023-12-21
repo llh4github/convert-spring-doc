@@ -3,8 +3,8 @@ package io.github.llh4github.convertspringdoc.convert
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.TypeDeclaration
 import com.github.javaparser.ast.expr.*
-import io.github.llh4github.convertspringdoc.dto.sw2.ApiAnno
 import io.github.llh4github.convertspringdoc.dto.sw3.TagAnno
+import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.tags.Tags
@@ -18,9 +18,10 @@ import org.apache.logging.log4j.kotlin.Logging
  */
 class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
 
-    private val className: String by lazy { typeDeclaration.name.toString() }
+    private val className: String by lazy { typeDeclaration.name.asString() }
+    private val sourceAnno: String = Api::class.simpleName!!
     fun convert() {
-        val noAnno = typeDeclaration.annotations.count { it.name.toString() == ApiAnno().annoName } == 0
+        val noAnno = typeDeclaration.annotations.count { it.name.asString() == sourceAnno } == 0
         if (noAnno) {
             logger.debug("$className 类没有目标注解: Api")
             return
@@ -28,19 +29,18 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
         typeDeclaration.annotations.filter { it.name.toString() == "Api" }
             .forEach {
                 when (it) {
-                    is SingleMemberAnnotationExpr -> singleMember(it)
+                    is SingleMemberAnnotationExpr -> singleAnno(it)
                     is NormalAnnotationExpr -> normalAnnotation(it)
-                    else -> logger.debug("$className 无Api注解")
+                    else -> logger.debug("$className 无 $sourceAnno 注解")
                 }
             }
 
-
     }
 
-    private fun singleMember(anno: SingleMemberAnnotationExpr) {
+    private fun singleAnno(anno: SingleMemberAnnotationExpr) {
         val value = anno.memberValue
         typeDeclaration.tryAddImportToParentCompilationUnit(Tag::class.java)
-        val needAdd = SingleMemberAnnotationExpr(Name(TagAnno().annoName), value)
+        val needAdd = SingleMemberAnnotationExpr(Name(sourceAnno), value)
         typeDeclaration.addAnnotation(needAdd)
         anno.remove()
         logger.debug("$className 注解 $anno 替换为 $needAdd")
@@ -58,7 +58,7 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
     ): SingleMemberAnnotationExpr? {
         val valuePairs = pairs.firstOrNull { it.name.asString() == "value" }
         if (valuePairs == null) {
-            logger.debug("$className Api注解无 value属性")
+            logger.debug("$className $sourceAnno 注解无 value属性")
             return null
         }
         val value = valuePairs.value
@@ -70,7 +70,7 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
         val tagAnno = handleValueProperty(pairs)
         val tagsPairs = pairs.firstOrNull { it.name.asString() == "tags" }
         if (tagsPairs == null) {
-            logger.debug("$className Api注解无 tags 属性")
+            logger.debug("$className $sourceAnno 注解无 tags 属性")
             tagAnno?.let { typeDeclaration.addAnnotation(it) }
         } else {
             typeDeclaration.tryAddImportToParentCompilationUnit(Tags::class.java)

@@ -4,6 +4,8 @@ import com.github.javaparser.StaticJavaParser
 import com.github.javaparser.printer.DefaultPrettyPrinter
 import org.apache.logging.log4j.kotlin.logger
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 /**
  *
@@ -20,7 +22,8 @@ class ApiToTagTest {
        """.trimIndent()
 
 
-    @Test
+    @ParameterizedTest
+    @ValueSource()
     fun t1() {
         val parserRs = StaticJavaParser.parse(clazz)
         parserRs.types.forEach { ApiToTag(it).convert() }
