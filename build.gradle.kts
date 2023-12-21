@@ -24,6 +24,7 @@ dependencies {
 //    implementation("org.springdoc:springdoc-openapi-common:1.6.8")
     implementation("com.github.javaparser:javaparser-core:3.25.7")
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
 }
 
 tasks.test {
