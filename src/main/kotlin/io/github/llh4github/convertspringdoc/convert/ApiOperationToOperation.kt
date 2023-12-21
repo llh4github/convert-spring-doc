@@ -31,7 +31,7 @@ class ApiOperationToOperation(private val typeDeclaration: TypeDeclaration<*>) :
                     when (it) {
                         is SingleMemberAnnotationExpr -> singleAnno(it, method)
                         is NormalAnnotationExpr -> normalAnnotation(it, method)
-                        else -> logger.debug("$className 无 $sourceAnnoName 注解")
+                        else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
                     }
                 }
         }
