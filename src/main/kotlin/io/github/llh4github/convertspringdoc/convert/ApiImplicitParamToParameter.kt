@@ -39,9 +39,16 @@ open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclarat
         anno.remove()
     }
 
-    protected fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
-        val pairs = NodeList<MemberValuePair>()
-        anno.pairs.forEach {
+   private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
+        val pairs = handleProperties(anno.pairs)
+        val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
+        method.addAnnotation(tagsAnno)
+        anno.remove()
+    }
+
+    protected fun handleProperties(pairs: NodeList<MemberValuePair>): NodeList<MemberValuePair> {
+        val rs = NodeList<MemberValuePair>()
+        pairs.forEach {
             when (val name = it.name.asString()) {
                 "name" -> pairs.add(MemberValuePair("name", StringLiteralExpr(it.value.toString())))
                 "value" -> pairs.add(MemberValuePair("description", it.value))
@@ -50,8 +57,6 @@ open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclarat
                 else -> logger.debug("$sourceAnnoName 注解的 $name 在 $targetAnnoName 注解中无对应属性")
             }
         }
-        val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
-        method.addAnnotation(tagsAnno)
-        anno.remove()
+        return rs
     }
 }
