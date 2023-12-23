@@ -1,12 +1,2 @@
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
-}
-
-rootProject.name = "convert-spring-doc"
+rootProject.name = "sw3-convert"
+include("core")
