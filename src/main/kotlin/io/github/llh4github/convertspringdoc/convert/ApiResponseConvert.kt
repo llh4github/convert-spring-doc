@@ -15,21 +15,22 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/21 22:42
  * @author llh
  */
-class ApiResponseConvert(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+class ApiResponseConvert(
+    private val typeDeclaration: TypeDeclaration<*>
+) : SwAnnoConvert, Logging {
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiResponse::class.simpleName!!
     private val targetAnnoName: String = sourceAnnoName
 
-//    @ApiResponse(message = "", code = 22)
-    fun convert() {
+    override fun convert() {
         val list = typeDeclaration.methods
         list.forEach { method ->
             method.annotations.filter { it.name.asString() == sourceAnnoName }
                 .forEach {
-                   when(it){
-                       is NormalAnnotationExpr -> normalAnnotation(it, method)
-                       else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
-                   }
+                    when (it) {
+                        is NormalAnnotationExpr -> normalAnnotation(it, method)
+                        else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
+                    }
                 }
         }
     }

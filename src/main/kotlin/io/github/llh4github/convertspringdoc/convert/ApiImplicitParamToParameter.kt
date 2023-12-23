@@ -16,13 +16,14 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/21 22:42
  * @author llh
  */
-open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+open class ApiImplicitParamToParameter(
+    private val typeDeclaration: TypeDeclaration<*>
+) : Logging, SwAnnoConvert{
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiImplicitParam::class.simpleName!!
     private val targetAnnoName: String = Parameter::class.simpleName!!
 
-    //    @ApiResponse(message = "", code = 22)
-    open fun convert() {
+    override fun convert() {
         typeDeclaration.methods.forEach { method ->
             method.annotations.filter { it.name.asString() == sourceAnnoName }
                 .forEach {
@@ -43,23 +44,10 @@ open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclarat
     }
 
     private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
-        val pairs = handleProperties(anno.pairs)
+        val pairs = handleApiImplicitParamProperties(anno.pairs)
         val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
         method.addAnnotation(tagsAnno)
         anno.remove()
     }
 
-    protected fun handleProperties(pairs: NodeList<MemberValuePair>): NodeList<MemberValuePair> {
-        val rs = NodeList<MemberValuePair>()
-        pairs.forEach {
-            when (val name = it.name.asString()) {
-                "name" -> rs.add(MemberValuePair("name", it.value))
-                "value" -> rs.add(MemberValuePair("description", it.value))
-                "defaultValue" -> rs.add(MemberValuePair("example", it.value))
-                "required" -> rs.add(MemberValuePair("required", it.value))
-                else -> logger.debug("$sourceAnnoName 注解的 $name 在 $targetAnnoName 注解中无对应属性")
-            }
-        }
-        return rs
-    }
 }

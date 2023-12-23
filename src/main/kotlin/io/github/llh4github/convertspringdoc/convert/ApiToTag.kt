@@ -15,11 +15,13 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/20 15:55
  * @author llh
  */
-class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+class ApiToTag(
+    private val typeDeclaration: TypeDeclaration<*>
+) : SwAnnoConvert, Logging {
 
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = Api::class.simpleName!!
-    fun convert() {
+    override fun convert() {
         val noAnno = typeDeclaration.annotations.count { it.name.asString() == sourceAnnoName } == 0
         if (noAnno) {
             logger.debug("$className 类没有目标注解: Api")

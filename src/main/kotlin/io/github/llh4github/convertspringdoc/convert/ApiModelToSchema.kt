@@ -16,13 +16,15 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/22 14:26
  * @author llh
  */
-class ApiModelToSchema(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+class ApiModelToSchema(
+    private val typeDeclaration: TypeDeclaration<*>
+) : SwAnnoConvert, Logging {
 
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiModel::class.simpleName!!
     private val targetAnnoName: String = Schema::class.simpleName!!
 
-    fun convert() {
+    override fun convert() {
         typeDeclaration.annotations.filter { it.name.asString() == sourceAnnoName }
             .forEach {
                 when (it) {

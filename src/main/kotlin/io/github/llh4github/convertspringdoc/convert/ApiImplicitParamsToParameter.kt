@@ -15,7 +15,7 @@ import org.apache.logging.log4j.kotlin.Logging
  */
 class ApiImplicitParamsToParameter(
     private val typeDeclaration: TypeDeclaration<*>
-) : ApiImplicitParamToParameter(typeDeclaration), Logging {
+) : Logging, SwAnnoConvert  {
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiImplicitParams::class.simpleName!!
     private val targetAnnoName: String = Parameters::class.simpleName!!
@@ -38,7 +38,7 @@ class ApiImplicitParamsToParameter(
         if (memberValue is ArrayInitializerExpr) {
             memberValue.values.forEach {
                 if (it is NormalAnnotationExpr) {
-                    val pairs = handleProperties(it.pairs)
+                    val pairs = handleApiImplicitParamProperties(it.pairs)
                     val needAdd = NormalAnnotationExpr(Name(targetAnnoName), pairs)
                     annoList.add(needAdd)
                 } else {
@@ -68,7 +68,7 @@ class ApiImplicitParamsToParameter(
                 val list = NodeList<Expression>()
                 (it.value as ArrayInitializerExpr).values.forEach { ele ->
                     val innerAnno = (ele as NormalAnnotationExpr)
-                    val pairs = handleProperties(innerAnno.pairs)
+                    val pairs = handleApiImplicitParamProperties(innerAnno.pairs)
                     val needAdd = NormalAnnotationExpr(Name("Parameter"), pairs)
                     list.add(needAdd)
                 }

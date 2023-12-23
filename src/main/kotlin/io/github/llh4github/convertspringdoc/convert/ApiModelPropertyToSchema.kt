@@ -7,7 +7,6 @@ import com.github.javaparser.ast.expr.MarkerAnnotationExpr
 import com.github.javaparser.ast.expr.MemberValuePair
 import com.github.javaparser.ast.expr.Name
 import com.github.javaparser.ast.expr.NormalAnnotationExpr
-import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import org.apache.logging.log4j.kotlin.Logging
@@ -18,13 +17,15 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/22 14:26
  * @author llh
  */
-class ApiModelPropertyToSchema(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+class ApiModelPropertyToSchema(
+    private val typeDeclaration: TypeDeclaration<*>
+) : SwAnnoConvert, Logging {
 
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiModelProperty::class.simpleName!!
     private val targetAnnoName: String = Schema::class.simpleName!!
 
-    fun convert() {
+    override fun convert() {
         typeDeclaration.fields.forEach { fieldsAnnoHandle(it) }
     }
 

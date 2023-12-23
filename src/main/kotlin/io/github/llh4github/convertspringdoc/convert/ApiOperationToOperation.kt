@@ -16,14 +16,16 @@ import org.apache.logging.log4j.kotlin.Logging
  * Created At 2023/12/21 21:36
  * @author llh
  */
-class ApiOperationToOperation(private val typeDeclaration: TypeDeclaration<*>) : Logging {
+class ApiOperationToOperation(
+    private val typeDeclaration: TypeDeclaration<*>
+) : SwAnnoConvert, Logging {
 
 
     private val className: String by lazy { typeDeclaration.name.asString() }
     private val sourceAnnoName: String = ApiOperation::class.simpleName!!
     private val targetAnnoName: String = Operation::class.simpleName!!
 
-    fun convert() {
+    override fun convert() {
         val list = typeDeclaration.methods
         list.forEach { method ->
             method.annotations.filter { it.name.asString() == sourceAnnoName }
