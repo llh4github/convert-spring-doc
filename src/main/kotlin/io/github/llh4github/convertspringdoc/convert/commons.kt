@@ -1,5 +1,6 @@
 package io.github.llh4github.convertspringdoc.convert
 
+import com.github.javaparser.ast.ImportDeclaration
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.expr.MemberValuePair
 import org.apache.logging.log4j.kotlin.logger
@@ -20,3 +21,11 @@ internal fun handleApiImplicitParamProperties(pairs: NodeList<MemberValuePair>):
     return rs
 }
 
+internal fun removeSw2Import(imports: NodeList<ImportDeclaration>) {
+    imports.forEach {
+        if (it.name.asString().contains("io.swagger.annotations")) {
+            it.remove()
+            logger.debug("移除导入 ： ${it.name.asString()}")
+        }
+    }
+}
