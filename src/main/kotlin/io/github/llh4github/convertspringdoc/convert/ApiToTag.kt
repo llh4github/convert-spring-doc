@@ -30,7 +30,7 @@ class ApiToTag(private val typeDeclaration: TypeDeclaration<*>) : Logging {
                 when (it) {
                     is SingleMemberAnnotationExpr -> singleAnno(it)
                     is NormalAnnotationExpr -> normalAnnotation(it)
-                    else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
+                    else -> logger.error("$className  $sourceAnnoName 注解类型不正解")
                 }
             }
 

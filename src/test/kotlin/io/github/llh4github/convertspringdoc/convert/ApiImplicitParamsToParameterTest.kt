@@ -19,7 +19,7 @@ class ApiImplicitParamsToParameterTest{
            import io.swagger.annotations.ApiImplicitParams;
            import io.swagger.annotations.ApiImplicitParam;
            public class Demo{
-            @ApiImplicitParams({@ApiImplicitParam()})
+            @ApiImplicitParams({@ApiImplicitParam(name="a")})
             public void test(){}
            } 
        """.trimIndent()
@@ -35,7 +35,7 @@ class ApiImplicitParamsToParameterTest{
            import io.swagger.annotations.ApiImplicitParams;
            import io.swagger.annotations.ApiImplicitParam;
            public class Demo{
-            @ApiImplicitParams(value={@ApiImplicitParam(),@ApiImplicitParam()})
+            @ApiImplicitParams(value={@ApiImplicitParam(name="a"),@ApiImplicitParam()})
             public void test(){}
            } 
        """.trimIndent()

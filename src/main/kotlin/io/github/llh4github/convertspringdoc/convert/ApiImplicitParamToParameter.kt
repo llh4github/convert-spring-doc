@@ -3,7 +3,10 @@ package io.github.llh4github.convertspringdoc.convert
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.MethodDeclaration
 import com.github.javaparser.ast.body.TypeDeclaration
-import com.github.javaparser.ast.expr.*
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr
+import com.github.javaparser.ast.expr.MemberValuePair
+import com.github.javaparser.ast.expr.Name
+import com.github.javaparser.ast.expr.NormalAnnotationExpr
 import io.swagger.annotations.ApiImplicitParam
 import io.swagger.v3.oas.annotations.Parameter
 import org.apache.logging.log4j.kotlin.Logging
@@ -39,7 +42,7 @@ open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclarat
         anno.remove()
     }
 
-   private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
+    private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
         val pairs = handleProperties(anno.pairs)
         val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
         method.addAnnotation(tagsAnno)
@@ -50,10 +53,10 @@ open class ApiImplicitParamToParameter(private val typeDeclaration: TypeDeclarat
         val rs = NodeList<MemberValuePair>()
         pairs.forEach {
             when (val name = it.name.asString()) {
-                "name" -> pairs.add(MemberValuePair("name", StringLiteralExpr(it.value.toString())))
-                "value" -> pairs.add(MemberValuePair("description", it.value))
-                "defaultValue" -> pairs.add(MemberValuePair("example", it.value))
-                "required" -> pairs.add(MemberValuePair("required", it.value))
+                "name" -> rs.add(MemberValuePair("name", it.value))
+                "value" -> rs.add(MemberValuePair("description", it.value))
+                "defaultValue" -> rs.add(MemberValuePair("example", it.value))
+                "required" -> rs.add(MemberValuePair("required", it.value))
                 else -> logger.debug("$sourceAnnoName 注解的 $name 在 $targetAnnoName 注解中无对应属性")
             }
         }
