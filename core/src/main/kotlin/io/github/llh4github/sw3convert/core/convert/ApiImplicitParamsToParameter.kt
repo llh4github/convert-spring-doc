@@ -76,6 +76,7 @@ class ApiImplicitParamsToParameter(
             }
         }
         method.addAnnotation(NormalAnnotationExpr(Name(targetAnnoName), subAnno))
+        typeDeclaration.tryAddImportToParentCompilationUnit(Parameters::class.java)
         anno.remove()
     }
 }

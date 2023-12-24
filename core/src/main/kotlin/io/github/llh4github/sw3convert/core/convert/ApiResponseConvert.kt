@@ -7,7 +7,6 @@ import com.github.javaparser.ast.expr.MemberValuePair
 import com.github.javaparser.ast.expr.Name
 import com.github.javaparser.ast.expr.NormalAnnotationExpr
 import com.github.javaparser.ast.expr.StringLiteralExpr
-import io.swagger.annotations.ApiResponse
 import org.apache.logging.log4j.kotlin.Logging
 
 /**
@@ -19,12 +18,11 @@ class ApiResponseConvert(
     private val typeDeclaration: TypeDeclaration<*>
 ) : SwAnnoConvert, Logging {
     private val className: String by lazy { typeDeclaration.name.asString() }
-    private val sourceAnnoName: String = ApiResponse::class.simpleName!!
+    private val sourceAnnoName: String = ApiResponse2::class.simpleName!!
     private val targetAnnoName: String = sourceAnnoName
 
     override fun convert() {
-        val list = typeDeclaration.methods
-        list.forEach { method ->
+        typeDeclaration.methods.forEach { method ->
             method.annotations.filter { it.name.asString() == sourceAnnoName }
                 .forEach {
                     when (it) {
@@ -36,17 +34,10 @@ class ApiResponseConvert(
     }
 
     private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
-        val list = anno.pairs
-        val pairs = NodeList<MemberValuePair>()
-        list.forEach {
-            when (val name = it.name.asString()) {
-                "code" -> pairs.add(MemberValuePair("responseCode", StringLiteralExpr(it.value.toString())))
-                "message" -> pairs.add(MemberValuePair("description", it.value))
-                else -> logger.debug("$sourceAnnoName 注解的 $name 在 $targetAnnoName 注解中无对应属性")
-            }
-        }
+       val pairs = handleApiResponseProperties(anno)
         val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
         method.addAnnotation(tagsAnno)
+        typeDeclaration.tryAddImportToParentCompilationUnit(ApiResponse3::class.java)
         anno.remove()
     }
 }

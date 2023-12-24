@@ -30,23 +30,25 @@ class ApiModelPropertyToSchema(
     }
 
     private fun fieldsAnnoHandle(field: FieldDeclaration) {
-        field.annotations.forEach {
-            when (it) {
-                is MarkerAnnotationExpr -> handleMarkerAnno(it)
-                is NormalAnnotationExpr -> handleNormalAnno(it)
-                else -> logger.debug("$className ${it.name.asString()} 字段 $sourceAnnoName 注解类型不正确")
+        field.annotations
+            .filter { it.name.asString() == sourceAnnoName }
+            .forEach {
+                when (it) {
+                    is MarkerAnnotationExpr -> handleMarkerAnno(it, field)
+                    is NormalAnnotationExpr -> handleNormalAnno(it, field)
+                    else -> logger.debug("$className ${it.name.asString()} 字段 $sourceAnnoName 注解类型不正确")
+                }
+                it.remove()
             }
-        }
     }
 
-    private fun handleMarkerAnno(anno: MarkerAnnotationExpr) {
+    private fun handleMarkerAnno(anno: MarkerAnnotationExpr, field: FieldDeclaration) {
         val needAdd = MarkerAnnotationExpr(targetAnnoName)
         typeDeclaration.tryAddImportToParentCompilationUnit(Schema::class.java)
-        typeDeclaration.addAnnotation(needAdd)
-        anno.remove()
+        field.addAnnotation(needAdd)
     }
 
-    private fun handleNormalAnno(anno: NormalAnnotationExpr) {
+    private fun handleNormalAnno(anno: NormalAnnotationExpr, field: FieldDeclaration) {
         val pairs = NodeList<MemberValuePair>()
         anno.pairs.forEach {
             when (val key = it.name.asString()) {
@@ -59,7 +61,6 @@ class ApiModelPropertyToSchema(
         }
         typeDeclaration.tryAddImportToParentCompilationUnit(Schema::class.java)
         val needAddAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
-        typeDeclaration.addAnnotation(needAddAnno)
-        anno.remove()
+        field.addAnnotation(needAddAnno)
     }
 }

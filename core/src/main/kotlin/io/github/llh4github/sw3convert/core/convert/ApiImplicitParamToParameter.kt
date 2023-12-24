@@ -23,13 +23,15 @@ open class ApiImplicitParamToParameter(
 
     override fun convert() {
         typeDeclaration.methods.forEach { method ->
-            method.annotations.filter { it.name.asString() == sourceAnnoName }
+            method.annotations
+                .filter { it.name.asString() == sourceAnnoName }
                 .forEach {
                     when (it) {
                         is MarkerAnnotationExpr -> markerAnnotation(it, method)
                         is NormalAnnotationExpr -> normalAnnotation(it, method)
                         else -> logger.debug("$className ${method.name.asString()} 方法  $sourceAnnoName 注解类型不正解")
                     }
+                    it.remove()
                 }
         }
     }
@@ -44,6 +46,7 @@ open class ApiImplicitParamToParameter(
     private fun normalAnnotation(anno: NormalAnnotationExpr, method: MethodDeclaration) {
         val pairs = handleApiImplicitParamProperties(anno.pairs)
         val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
+        typeDeclaration.tryAddImportToParentCompilationUnit(Parameter::class.java)
         method.addAnnotation(tagsAnno)
         anno.remove()
     }
