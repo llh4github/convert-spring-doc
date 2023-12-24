@@ -18,7 +18,7 @@ class JavaFileIterAndConvertTest {
      * test only local
      */
     @Test
-//    @Disabled
+    @Disabled
     fun test() {
         val sourcePath = "C:\\code-projects\\jvm\\testcase"
         val params = ConvertParams(sourcePath)

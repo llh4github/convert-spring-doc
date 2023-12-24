@@ -34,6 +34,7 @@ object SwAnnoConvertFactory {
         ApiOperationToOperation(typeDeclaration).convert()
         ApiResponseConvert(typeDeclaration).convert()
         ApiToTag(typeDeclaration).convert()
+        ApiResponsesConvert(typeDeclaration).convert()
     }
 
 }
