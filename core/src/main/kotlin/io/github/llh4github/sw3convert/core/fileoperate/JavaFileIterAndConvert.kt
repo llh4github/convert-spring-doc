@@ -1,6 +1,8 @@
 package io.github.llh4github.sw3convert.core.fileoperate
 
 import io.github.llh4github.sw3convert.core.convert.SwAnnoConvertFactory
+import io.github.llh4github.sw3convert.core.dto.ConvertParams
+import io.github.llh4github.sw3convert.core.dto.ParseResult
 import org.apache.logging.log4j.kotlin.Logging
 import java.io.File
 
@@ -10,12 +12,21 @@ import java.io.File
  * @author llh
  */
 object JavaFileIterAndConvert : Logging {
-    fun convertJavaFile(path: String) {
+    fun convertJavaFile(params: ConvertParams) {
+        val path = params.sourcePath
         val filePath = File(path)
         if (!filePath.exists()) {
             logger.error("$path 指定文件不存在！")
         }
         val files = javaFileList(filePath)
-        files.map { it.name }.forEach{ println(it) }
+        files.mapNotNull { modifiedFile(it) }
+            .toList()
+    }
+    private fun modifiedFile(file:File): Pair<File, ParseResult>? {
+       val parseResult = SwAnnoConvertFactory.convert(file)
+        if (parseResult.modified) {
+            return Pair(file,parseResult)
+        }
+        return null
     }
 }
