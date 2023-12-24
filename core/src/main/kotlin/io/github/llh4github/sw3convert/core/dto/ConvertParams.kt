@@ -11,11 +11,7 @@ data class ConvertParams(
      */
     val sourcePath: String,
     /**
-     * 是否覆盖原文件
-     */
-    val overrideFile: Boolean = false,
-    /**
-     * 复制到新目录。仅在[overrideFile]属性启用的情况下使用。
+     * 复制到新目录。
      */
     val targetDir: String? = null,
 )

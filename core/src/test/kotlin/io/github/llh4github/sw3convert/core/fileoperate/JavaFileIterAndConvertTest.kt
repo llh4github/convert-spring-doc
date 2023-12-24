@@ -25,6 +25,9 @@ class JavaFileIterAndConvertTest {
         JavaFileIterAndConvert.convertJavaFile(params)
     }
 
+    /**
+     * test only local
+     */
     @ParameterizedTest
     @CsvSource(
         value = [
@@ -32,6 +35,7 @@ class JavaFileIterAndConvertTest {
             "C:\\TestcaseApplication.java",
         ]
     )
+    @Disabled
     fun replace_path(path: String) {
         val file = replacePath(File(path), File("D:\\test"))
         println(file.absoluteFile)

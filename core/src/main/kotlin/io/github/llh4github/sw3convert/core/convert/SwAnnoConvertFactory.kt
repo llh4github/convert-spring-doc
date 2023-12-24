@@ -20,7 +20,7 @@ object SwAnnoConvertFactory {
 
     fun convert(raw: CompilationUnit): ParseResult {
         val rawHash = raw.hashCode()
-        removeSw2Import(raw.imports)
+        raw.setImports(removeSw2Import(raw.imports))
         raw.types.forEach { annoConvert(it) }
         val handledHash = raw.hashCode()
         return ParseResult(raw, handledHash != rawHash)

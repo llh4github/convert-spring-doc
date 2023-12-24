@@ -21,11 +21,8 @@ internal fun handleApiImplicitParamProperties(pairs: NodeList<MemberValuePair>):
     return rs
 }
 
-internal fun removeSw2Import(imports: NodeList<ImportDeclaration>) {
-    imports.forEach {
-        if (it.name.asString().contains("io.swagger.annotations")) {
-            it.remove()
-            logger.debug("移除导入 ： ${it.name.asString()}")
-        }
-    }
+internal fun removeSw2Import(imports: NodeList<ImportDeclaration>): NodeList<ImportDeclaration> {
+    return imports
+        .filter { !it.name.asString().contains("io.swagger.annotations") }
+        .toCollection(NodeList())
 }

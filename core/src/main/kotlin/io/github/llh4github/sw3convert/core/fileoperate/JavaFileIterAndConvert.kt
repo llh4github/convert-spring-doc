@@ -1,5 +1,6 @@
 package io.github.llh4github.sw3convert.core.fileoperate
 
+import com.github.javaparser.printer.DefaultPrettyPrinter
 import io.github.llh4github.sw3convert.core.convert.SwAnnoConvertFactory
 import io.github.llh4github.sw3convert.core.dto.ConvertParams
 import io.github.llh4github.sw3convert.core.dto.ParseResult
@@ -19,13 +20,23 @@ object JavaFileIterAndConvert : Logging {
             logger.error("$path 指定文件不存在！")
         }
         val files = javaFileList(filePath)
+        val targetDir = params.targetDir?.let { File(it) }
+        val prettyPrinter = DefaultPrettyPrinter()
         files.mapNotNull { modifiedFile(it) }
-            .toList()
+            .forEach {
+                if (targetDir != null) {
+                    val targetFile = replacePath(it.first, targetDir)
+                    targetFile.writeText(prettyPrinter.print(it.second.ast))
+                } else {
+                    it.first.writeText(prettyPrinter.print(it.second.ast))
+                }
+            }
     }
-    private fun modifiedFile(file:File): Pair<File, ParseResult>? {
-       val parseResult = SwAnnoConvertFactory.convert(file)
+
+    private fun modifiedFile(file: File): Pair<File, ParseResult>? {
+        val parseResult = SwAnnoConvertFactory.convert(file)
         if (parseResult.modified) {
-            return Pair(file,parseResult)
+            return Pair(file, parseResult)
         }
         return null
     }
