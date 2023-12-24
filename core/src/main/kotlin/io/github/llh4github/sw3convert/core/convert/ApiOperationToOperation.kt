@@ -35,6 +35,7 @@ class ApiOperationToOperation(
                         is NormalAnnotationExpr -> normalAnnotation(it, method)
                         else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
                     }
+                    it.remove()
                 }
         }
     }
@@ -42,7 +43,9 @@ class ApiOperationToOperation(
     private fun singleAnno(anno: SingleMemberAnnotationExpr, method: MethodDeclaration) {
         val value = anno.memberValue
         typeDeclaration.tryAddImportToParentCompilationUnit(Operation::class.java)
-        val needAdd = SingleMemberAnnotationExpr(Name(targetAnnoName), value)
+        val pairs = NodeList<MemberValuePair>()
+        pairs.add(MemberValuePair("summary", value))
+        val needAdd = NormalAnnotationExpr(Name(targetAnnoName), pairs)
         method.addAnnotation(needAdd)
         anno.remove()
         logger.debug("$className#${method.nameAsString} 注解 $anno 替换为 $needAdd")

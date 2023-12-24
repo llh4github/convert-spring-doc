@@ -2,10 +2,7 @@ package io.github.llh4github.sw3convert.core.convert
 
 import com.github.javaparser.ast.NodeList
 import com.github.javaparser.ast.body.TypeDeclaration
-import com.github.javaparser.ast.expr.MarkerAnnotationExpr
-import com.github.javaparser.ast.expr.MemberValuePair
-import com.github.javaparser.ast.expr.Name
-import com.github.javaparser.ast.expr.NormalAnnotationExpr
+import com.github.javaparser.ast.expr.*
 import io.swagger.annotations.ApiModel
 import io.swagger.v3.oas.annotations.media.Schema
 import org.apache.logging.log4j.kotlin.Logging
@@ -29,10 +26,20 @@ class ApiModelToSchema(
             .forEach {
                 when (it) {
                     is MarkerAnnotationExpr -> handleMarkerAnno(it)
+                    is SingleMemberAnnotationExpr -> handleSingleMemberAnno(it)
                     is NormalAnnotationExpr -> handleNormalAnno(it)
                     else -> logger.debug("$className  $sourceAnnoName 注解类型不正解")
                 }
             }
+    }
+
+    private fun handleSingleMemberAnno(anno: SingleMemberAnnotationExpr) {
+        typeDeclaration.tryAddImportToParentCompilationUnit(Schema::class.java)
+        val pairs = NodeList<MemberValuePair>()
+        pairs.add(MemberValuePair("name", anno.memberValue))
+        val needAddAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
+        typeDeclaration.addAnnotation(needAddAnno)
+        anno.remove()
     }
 
     private fun handleMarkerAnno(anno: MarkerAnnotationExpr) {

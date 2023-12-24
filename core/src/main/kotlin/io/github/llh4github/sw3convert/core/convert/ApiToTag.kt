@@ -70,6 +70,7 @@ class ApiToTag(
     private fun handleValueAndTagsProperty(pairs: NodeList<MemberValuePair>) {
         val tagAnno = handleValueProperty(pairs)
         val tagsPairs = pairs.firstOrNull { it.name.asString() == "tags" }
+        typeDeclaration.tryAddImportToParentCompilationUnit(Tag::class.java)
         if (tagsPairs == null) {
             logger.debug("$className $sourceAnnoName 注解无 tags 属性")
             tagAnno?.let { typeDeclaration.addAnnotation(it) }
@@ -78,14 +79,19 @@ class ApiToTag(
             val nodeList: NodeList<Expression> = NodeList()
             when (tagsPairs.value) {
                 is StringLiteralExpr -> {
-                    val anno = SingleMemberAnnotationExpr(Name("Tag"), tagsPairs.value)
+                    val tmp = NodeList<MemberValuePair>()
+                    tmp.add(MemberValuePair("name", tagsPairs.value))
+                    val anno = NormalAnnotationExpr(Name("Tag"), tmp)
                     nodeList.add(anno)
                 }
 
                 is ArrayInitializerExpr -> {
                     val a = tagsPairs.value as ArrayInitializerExpr
-                    val list = a.values.map { SingleMemberAnnotationExpr(Name("Tag"), it) }
-                        .toList()
+                    val list = a.values.map {
+                        val tmp = NodeList<MemberValuePair>()
+                        tmp.add(MemberValuePair("name", it))
+                        NormalAnnotationExpr(Name("Tag"), tmp)
+                    }.toList()
                     nodeList.addAll(list)
                 }
 

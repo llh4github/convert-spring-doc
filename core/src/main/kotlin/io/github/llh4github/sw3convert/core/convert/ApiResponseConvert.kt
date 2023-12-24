@@ -47,6 +47,7 @@ class ApiResponseConvert(
         }
         val tagsAnno = NormalAnnotationExpr(Name(targetAnnoName), pairs)
         method.addAnnotation(tagsAnno)
+        typeDeclaration.tryAddImportToParentCompilationUnit(io.swagger.v3.oas.annotations.responses.ApiResponse::class.java)
         anno.remove()
     }
 }
