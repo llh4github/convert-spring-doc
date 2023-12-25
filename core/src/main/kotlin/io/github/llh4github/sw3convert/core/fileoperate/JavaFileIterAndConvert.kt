@@ -4,7 +4,7 @@ import com.github.javaparser.printer.DefaultPrettyPrinter
 import io.github.llh4github.sw3convert.core.convert.SwAnnoConvertFactory
 import io.github.llh4github.sw3convert.core.dto.ConvertParams
 import io.github.llh4github.sw3convert.core.dto.ParseResult
-import org.apache.logging.log4j.kotlin.Logging
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 
 /**
@@ -12,7 +12,8 @@ import java.io.File
  * Created At 2023/12/23 17:17
  * @author llh
  */
-object JavaFileIterAndConvert : Logging {
+object JavaFileIterAndConvert {
+    val logger = logger("JavaFileIterAndConvert")
     fun convertJavaFile(params: ConvertParams) {
         val path = params.sourcePath
         val filePath = File(path)
