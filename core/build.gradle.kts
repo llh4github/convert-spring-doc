@@ -4,7 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.21"
     `java-library`
 }
-
+repositories {
+    mavenCentral()
+}
 dependencies {
     implementation(libs.log4j.core)
     implementation(libs.log4j.api)
