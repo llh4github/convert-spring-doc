@@ -1,8 +1,11 @@
+import org.gradle.jvm.tasks.Jar
+
 group = "io.github.llh4github"
 version = property("version")!!
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.21"
+    java
     application
 }
 repositories {
@@ -19,6 +22,12 @@ java {
     }
 }
 
-application{
-    mainClass.set("io.github.llh4github.sw3convert.cli.Sw3")
+application {
+    mainClass.set("io.github.llh4github.sw3convert.cli.MainKt")
 }
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = application.mainClass
+    }
+}
+
