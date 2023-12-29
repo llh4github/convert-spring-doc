@@ -14,6 +14,7 @@ val fxVersion = "17"
 dependencies {
     implementation("org.openjfx:javafx-controls:${fxVersion}")
     implementation("org.openjfx:javafx-fxml:${fxVersion}")
+    implementation("org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0")
 }
 javafx {
     version = "17"

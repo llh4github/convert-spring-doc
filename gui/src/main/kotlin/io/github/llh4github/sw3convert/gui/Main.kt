@@ -1,9 +1,13 @@
 package io.github.llh4github.sw3convert.gui
 
 import javafx.application.Application
+import javafx.geometry.Insets
 import javafx.scene.Scene
+import javafx.scene.control.Button
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
+import org.kordamp.bootstrapfx.BootstrapFX
+import org.kordamp.bootstrapfx.scene.layout.Panel
 
 /**
  *
@@ -13,10 +17,18 @@ import javafx.stage.Stage
  */
 class Main : Application() {
     override fun start(primaryStage: Stage) {
+        val panel = Panel("This is A title")
+        panel.styleClass.add("panel-primary")
         val root = BorderPane()
-        val scene = Scene(root, 400.0, 400.0)
+        root.padding = Insets(20.0)
+        val btn = Button("Hello Btn")
+        btn.styleClass.setAll("btn", "btn-danger")
+        root.center = btn
+        panel.body = root
+        val scene = Scene(panel, 400.0, 400.0)
+        scene.stylesheets.add(BootstrapFX.bootstrapFXStylesheet())
         primaryStage.scene = scene
-        primaryStage.title="JavaFx Demo"
+        primaryStage.title = "JavaFx Demo"
         primaryStage.show()
     }
 }
