@@ -1,2 +1,2 @@
 rootProject.name = "sw3-convert"
-include("core", "cli")
+include("core", "cli","gui")
