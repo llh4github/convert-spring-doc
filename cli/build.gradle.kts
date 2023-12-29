@@ -17,11 +17,11 @@ dependencies {
     implementation(libs.clikt)
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
+//java {
+//    toolchain {
+//        languageVersion.set(JavaLanguageVersion.of(17))
+//    }
+//}
 
 application {
     mainClass.set("io.github.llh4github.sw3convert.cli.MainKt")
